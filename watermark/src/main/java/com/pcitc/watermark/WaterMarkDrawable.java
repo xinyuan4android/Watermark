@@ -1,12 +1,10 @@
 package com.pcitc.watermark;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
-import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 
@@ -68,6 +66,7 @@ public class WaterMarkDrawable extends Drawable {
 
     public void setTextColor(int textColor) {
         this.textColor = textColor;
+
         mTextPaint.setColor(textColor);
         invalidateSelf();
     }
@@ -208,6 +207,21 @@ public class WaterMarkDrawable extends Drawable {
         invalidateSelf();
     }
 
+    private
+    @WatermarkGravity.WatermarkGravities
+    int watermarkGravity = WatermarkGravity.CENTER;
+    private
+    @WatermarkMode.WatermarkModes
+    int watermarkMode = WatermarkMode.REPEAT;
+
+    public void setWatermarkGravity(@WatermarkGravity.WatermarkGravities int watermarkGravity) {
+        this.watermarkGravity = watermarkGravity;
+    }
+
+    public void setWatermarkMode(@WatermarkMode.WatermarkModes int watermarkMode) {
+        this.watermarkMode = watermarkMode;
+    }
+
     @Override
     public void draw(@NonNull Canvas canvas) {
         canvas.drawColor(bgColor);
@@ -215,6 +229,17 @@ public class WaterMarkDrawable extends Drawable {
         canvas.save();
         //旋转画布
         canvas.rotate(degrees);
+        switch (watermarkMode) {
+            case WatermarkMode.REPEAT:
+                drawRepeat(canvas);
+                break;
+            case WatermarkMode.SINGLE:
+                drawSingle(canvas);
+                break;
+        }
+    }
+
+    private void drawSingle(Canvas canvas) {
         int width = getBounds().right;
         int height = getBounds().bottom;
         String[] strings = waterMarkText.split("\n");
@@ -226,7 +251,7 @@ public class WaterMarkDrawable extends Drawable {
         }
         Paint.FontMetricsInt fm = mTextPaint.getFontMetricsInt();
         int index = 0;
-        Bitmap bitmap = WaterMarkUtils.bitmapDecodeResource(R.drawable.ic_launcher);
+//        Bitmap bitmap = WaterMarkUtils.bitmapDecodeResource(R.drawable.ic_launcher);
 //        int waterMarkHeightLeading = height / 10;
         //从垂直方向遍历。从屏幕的顶部到底部。从waterMarkHeightLeading 到屏幕的高度。
         for (float positionY = -height; positionY <= height * 2; positionY += waterMarkVerticalSpacing) {
@@ -242,15 +267,52 @@ public class WaterMarkDrawable extends Drawable {
                     String s = strings[j];
                     //改变水平坐标X，就可以改变多行水印的对齐方式。待完成
                     canvas.drawText(s, positionX, positionY - fm.top + textHeightPerLine * j, mTextPaint);
-                    RectF rectF = new RectF(positionX, positionY + textHeightPerLine * j,
-                            positionX + textHeightPerLine, positionY + textHeightPerLine * (j + 1));
-//                    canvas.drawRect(rectF, mPaint);
-                    canvas.drawBitmap(bitmap, null, rectF, mTextPaint);
+
                 }
             }
             positionY += textHeightPerLine * strings.length;
         }
     }
+
+    private void drawRepeat(Canvas canvas) {
+        int width = getBounds().right;
+        int height = getBounds().bottom;
+        String[] strings = waterMarkText.split("\n");
+        //每一行文字的最大宽度
+        float textWidthMax = 0.0F;
+        for (String s : strings) {
+            float textWidth = mTextPaint.measureText(s);
+            textWidthMax = Math.max(textWidthMax, textWidth);
+        }
+        Paint.FontMetricsInt fm = mTextPaint.getFontMetricsInt();
+        int index = 0;
+//        Bitmap bitmap = WaterMarkUtils.bitmapDecodeResource(R.drawable.ic_launcher);
+//        int waterMarkHeightLeading = height / 10;
+        //从垂直方向遍历。从屏幕的顶部到底部。从waterMarkHeightLeading 到屏幕的高度。
+        for (float positionY = -height; positionY <= height * 2; positionY += waterMarkVerticalSpacing) {
+            //水平方向遍历。从屏幕左边到右边。从-width开始画，就是从屏幕左边的外边开始画。
+            //之所以从屏幕外开始画，因为，我们一般都是左低右高便宜角，多画一些会保证屏幕左下角不会出现空白的情况。
+            float fromX = -width + (index++ % 2) * offSpace;
+            //每一行文字的高度
+            float textHeightPerLine = fm.bottom - fm.top;
+            for (float positionX = fromX; positionX < width * 2; positionX += (textWidthMax + waterMarkHorizontalSpacing)) {
+                //开始画文字，考虑到换行的情况。
+                //每一次换行时，垂直方向的高度都要加一次 每一行文字的高度。
+                for (int j = 0; j < strings.length; j++) {
+                    String s = strings[j];
+                    //改变水平坐标X，就可以改变多行水印的对齐方式。待完成
+                    canvas.drawText(s, positionX, positionY - fm.top + textHeightPerLine * j, mTextPaint);
+
+                }
+            }
+            positionY += textHeightPerLine * strings.length;
+        }
+    }
+
+//                    RectF rectF = new RectF(positionX, positionY + textHeightPerLine * j,
+//                            positionX + textHeightPerLine, positionY + textHeightPerLine * (j + 1));
+////                    canvas.drawRect(rectF, mPaint);
+//                    canvas.drawBitmap(bitmap, null, rectF, mTextPaint);
 
 //    //保存画布当前状态
 //        canvas.save();
