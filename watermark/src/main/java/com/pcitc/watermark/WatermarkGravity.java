@@ -19,8 +19,12 @@ public class WatermarkGravity {
     public static final int BOTTOM = 4;
     /*--中心--*/
     public static final int CENTER = 5;
+    /*--垂直居中--*/
+    public static final int CENTER_VERTICAL = 6;
+    /*--水平居中--*/
+    public static final int CENTER_HORIZONTAL = 7;
 
-    @IntDef({TOP, LEFT, RIGHT, BOTTOM, CENTER})
+    @IntDef({TOP, LEFT, RIGHT, BOTTOM, CENTER, CENTER_VERTICAL, CENTER_HORIZONTAL})
     @Retention(RetentionPolicy.SOURCE)
     public @interface WatermarkGravities {
     }
