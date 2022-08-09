@@ -189,7 +189,12 @@ public class WaterMarkDrawable extends Drawable {
     }
 
     /**
-     * 偏离间距，单位px。
+     * 奇数行和偶数行之间的偏离间距，单位px。
+     * 比如下面的例子，---表示偏离距离
+     * 1111111
+     * ---1111111
+     * 1111111
+     * ---1111111
      */
     private float offSpace;
     private static final float OFF_DEFAULT_SPACE = 50.0F;
@@ -209,17 +214,22 @@ public class WaterMarkDrawable extends Drawable {
 
     private
     @WatermarkGravity.WatermarkGravities
-    int watermarkGravity = WatermarkGravity.CENTER;
+    int mWatermarkGravity = WatermarkGravity.CENTER;
     private
     @WatermarkMode.WatermarkModes
-    int watermarkMode = WatermarkMode.REPEAT;
+    int mWatermarkMode = WatermarkMode.REPEAT;
 
     public void setWatermarkGravity(@WatermarkGravity.WatermarkGravities int watermarkGravity) {
-        this.watermarkGravity = watermarkGravity;
+        this.mWatermarkGravity = watermarkGravity;
+        invalidateSelf();
     }
 
     public void setWatermarkMode(@WatermarkMode.WatermarkModes int watermarkMode) {
-        this.watermarkMode = watermarkMode;
+        if (mWatermarkMode == watermarkMode) {
+            return;
+        }
+        mWatermarkMode = watermarkMode;
+        invalidateSelf();
     }
 
     @Override
@@ -229,7 +239,7 @@ public class WaterMarkDrawable extends Drawable {
         canvas.save();
         //旋转画布
         canvas.rotate(degrees);
-        switch (watermarkMode) {
+        switch (mWatermarkMode) {
             case WatermarkMode.REPEAT:
                 drawRepeat(canvas);
                 break;
@@ -250,27 +260,51 @@ public class WaterMarkDrawable extends Drawable {
             textWidthMax = Math.max(textWidthMax, textWidth);
         }
         Paint.FontMetricsInt fm = mTextPaint.getFontMetricsInt();
-        int index = 0;
-//        Bitmap bitmap = WaterMarkUtils.bitmapDecodeResource(R.drawable.ic_launcher);
-//        int waterMarkHeightLeading = height / 10;
-        //从垂直方向遍历。从屏幕的顶部到底部。从waterMarkHeightLeading 到屏幕的高度。
-        for (float positionY = -height; positionY <= height * 2; positionY += waterMarkVerticalSpacing) {
-            //水平方向遍历。从屏幕左边到右边。从-width开始画，就是从屏幕左边的外边开始画。
-            //之所以从屏幕外开始画，因为，我们一般都是左低右高便宜角，多画一些会保证屏幕左下角不会出现空白的情况。
-            float fromX = -width + (index++ % 2) * offSpace;
-            //每一行文字的高度
-            float textHeightPerLine = fm.bottom - fm.top;
-            for (float positionX = fromX; positionX < width * 2; positionX += (textWidthMax + waterMarkHorizontalSpacing)) {
-                //开始画文字，考虑到换行的情况。
-                //每一次换行时，垂直方向的高度都要加一次 每一行文字的高度。
-                for (int j = 0; j < strings.length; j++) {
-                    String s = strings[j];
-                    //改变水平坐标X，就可以改变多行水印的对齐方式。待完成
-                    canvas.drawText(s, positionX, positionY - fm.top + textHeightPerLine * j, mTextPaint);
+        float textHeightPerLine = fm.bottom - fm.top;
 
-                }
-            }
-            positionY += textHeightPerLine * strings.length;
+        // 开始绘画的X轴坐标
+        float positionX = 0.0F;
+        // 开始会话的Y轴坐标
+        float positionY = 0.0F;
+        // 处理Y轴坐标
+        if ((mWatermarkGravity & WatermarkGravity.TOP) == WatermarkGravity.TOP) {
+            // top
+            // Y轴方向从单行文字的高度开始往下画，保证第一行文字不会绘制到屏幕外
+            positionY = textHeightPerLine;
+        }
+        if ((mWatermarkGravity & WatermarkGravity.BOTTOM) == WatermarkGravity.BOTTOM) {
+            // bottom
+            // Y轴方向从高度的最底部减去单行文字的高度乘以行数减一开始往下画，保证最后一行文字不会绘制到屏幕外
+            positionY = height - textHeightPerLine * (strings.length - 1);
+        }
+        if ((mWatermarkGravity & WatermarkGravity.CENTER_VERTICAL) == WatermarkGravity.CENTER_VERTICAL) {
+            // 垂直居中
+            // Y轴方向从高度的中间位置 加上单行文字的一半
+            positionY = height / 2.0F + fm.bottom;
+        }
+        // 处理X轴坐标
+        if ((mWatermarkGravity & WatermarkGravity.LEFT) == WatermarkGravity.LEFT) {
+            // left
+            // X轴方向从0的位置画
+            positionY = 0;
+        }
+        if ((mWatermarkGravity & WatermarkGravity.RIGHT) == WatermarkGravity.RIGHT) {
+            // right
+            // X轴方向从宽度的最大值减去单行文字宽度的最大值
+            positionX = width - textWidthMax;
+        }
+        if ((mWatermarkGravity & WatermarkGravity.CENTER_HORIZONTAL) == WatermarkGravity.CENTER_HORIZONTAL) {
+            // 水平居中
+            // X轴方向从宽度的一半 减去 单行宽度的最大值的一半
+            positionX = width / 2.0F - textWidthMax / 2;
+        }
+
+        //开始画文字，考虑到换行的情况。
+        //每一次换行时，垂直方向的高度都要加一次 每一行文字的高度。
+        for (int j = 0; j < strings.length; j++) {
+            String s = strings[j];
+            //改变水平坐标X，就可以改变多行水印的对齐方式。待完成
+            canvas.drawText(s, positionX, positionY + textHeightPerLine * j, mTextPaint);
         }
     }
 
@@ -301,7 +335,7 @@ public class WaterMarkDrawable extends Drawable {
                 for (int j = 0; j < strings.length; j++) {
                     String s = strings[j];
                     //改变水平坐标X，就可以改变多行水印的对齐方式。待完成
-                    canvas.drawText(s, positionX, positionY - fm.top + textHeightPerLine * j, mTextPaint);
+                    canvas.drawText(s, positionX, positionY + textHeightPerLine * j, mTextPaint);
 
                 }
             }
