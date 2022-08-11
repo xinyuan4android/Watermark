@@ -3,12 +3,12 @@ package com.pcitc.watermark;
 import android.app.Activity;
 import android.app.Application;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import androidx.annotation.NonNull;
 
 public class WaterMarkHelper {
     private static Application application;

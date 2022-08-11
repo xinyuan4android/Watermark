@@ -3,6 +3,7 @@ package com.pcitc.watermark;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -17,7 +18,6 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Arrays;
 
