@@ -18,14 +18,14 @@ public class WatermarkGravity {
     public static final int AXIS_X_SHIFT = 0;
     public static final int AXIS_Y_SHIFT = 4;
 
-    /*--顶部 二进制表示 0011 0000--*/
-    public static final int TOP = (AXIS_PULL_BEFORE | AXIS_SPECIFIED) << AXIS_Y_SHIFT;
-    /*--左边 二进制表示 0000 0011--*/
-    public static final int LEFT = (AXIS_PULL_BEFORE | AXIS_SPECIFIED) << AXIS_X_SHIFT;
-    /*--右边 二进制表示 0000 0101--*/
-    public static final int RIGHT = (AXIS_PULL_AFTER | AXIS_SPECIFIED) << AXIS_X_SHIFT;
-    /*--底部 二进制表示 0101 0000--*/
-    public static final int BOTTOM = (AXIS_PULL_AFTER | AXIS_SPECIFIED) << AXIS_Y_SHIFT;
+    /*--顶部 二进制表示 0010 0000。系统Gravity类是 0011 0000--*/
+    public static final int TOP = (AXIS_PULL_BEFORE) << AXIS_Y_SHIFT;
+    /*--左边 二进制表示 0000 0010。系统Gravity类是 0000 0011--*/
+    public static final int LEFT = (AXIS_PULL_BEFORE) << AXIS_X_SHIFT;
+    /*--右边 二进制表示 0000 0100。系统Gravity类是 0101 0000--*/
+    public static final int RIGHT = (AXIS_PULL_AFTER) << AXIS_X_SHIFT;
+    /*--底部 二进制表示 0100 0000--*/
+    public static final int BOTTOM = (AXIS_PULL_AFTER) << AXIS_Y_SHIFT;
 
     /*--垂直居中 二进制表示 0001 0000--*/
     public static final int CENTER_VERTICAL = AXIS_SPECIFIED << AXIS_Y_SHIFT;
