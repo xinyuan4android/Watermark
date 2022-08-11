@@ -237,7 +237,9 @@ public class WaterMarkDrawable extends Drawable {
         canvas.drawColor(bgColor);
         //保存画布当前状态
         canvas.save();
-        //旋转画布
+        // 旋转画布
+        // 注意这个rotate方法，旋转角度并不是在当前旋转的基础上再旋转
+        // （原来是rotate(0),多次调用rotate(10),都是在0的基础上旋转10，并不会10，20，30这样旋转）
         canvas.rotate(degrees);
         switch (mWatermarkMode) {
             case WatermarkMode.REPEAT:
@@ -249,6 +251,13 @@ public class WaterMarkDrawable extends Drawable {
         }
     }
 
+    /**
+     * 画Text的时候，起点是baseline，而不是文字的左下角。
+     * 所以对于文字来说，baseline以下的值为正数（比如：bottom、descent），
+     * baseline以上的值为负数（比如：top、ascent）。
+     *
+     * @param canvas
+     */
     private void drawSingle(Canvas canvas) {
         int width = getBounds().right;
         int height = getBounds().bottom;
@@ -264,29 +273,31 @@ public class WaterMarkDrawable extends Drawable {
 
         // 开始绘画的X轴坐标
         float positionX = 0.0F;
-        // 开始会话的Y轴坐标
-        float positionY = 0.0F;
+        // 开始绘画的Y轴坐标
+        float positionY = textHeightPerLine - fm.bottom;
         // 处理Y轴坐标
         if ((mWatermarkGravity & WatermarkGravity.TOP) == WatermarkGravity.TOP) {
             // top
             // Y轴方向从单行文字的高度开始往下画，保证第一行文字不会绘制到屏幕外
-            positionY = textHeightPerLine;
+            positionY = textHeightPerLine - fm.bottom;
         }
         if ((mWatermarkGravity & WatermarkGravity.BOTTOM) == WatermarkGravity.BOTTOM) {
             // bottom
             // Y轴方向从高度的最底部减去单行文字的高度乘以行数减一开始往下画，保证最后一行文字不会绘制到屏幕外
-            positionY = height - textHeightPerLine * (strings.length - 1);
+            positionY = height - textHeightPerLine * (strings.length - 1) - fm.bottom;
         }
         if ((mWatermarkGravity & WatermarkGravity.CENTER_VERTICAL) == WatermarkGravity.CENTER_VERTICAL) {
             // 垂直居中
-            // Y轴方向从高度的中间位置 加上单行文字的一半
-            positionY = height / 2.0F + fm.bottom;
+            // Y轴方向从高度的中间位置 加上 baseline的到文字中线的距离
+            // baseline的高度：等于 fm.bottom。
+            // baseline到文字中线的距离：等于文字高度的一半减去baseline的高度
+            positionY = height / 2.0F - ((textHeightPerLine / 2) * (strings.length - 2) + fm.bottom);
         }
         // 处理X轴坐标
         if ((mWatermarkGravity & WatermarkGravity.LEFT) == WatermarkGravity.LEFT) {
             // left
             // X轴方向从0的位置画
-            positionY = 0;
+            positionX = 0;
         }
         if ((mWatermarkGravity & WatermarkGravity.RIGHT) == WatermarkGravity.RIGHT) {
             // right
