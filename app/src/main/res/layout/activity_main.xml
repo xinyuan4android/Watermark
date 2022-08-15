@@ -36,30 +36,38 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <EditText
-                android:id="@+id/etWatermarkText"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="start|top"
-                android:hint="输入水印文字"
-                android:inputType="textMultiLine"
-                android:lines="3"
-                android:maxLines="3"
-                android:padding="16dp"
-                android:textColor="#000000"
-                android:textSize="18sp" />
-            <!-- 注意事项 -->
-            <!-- EditText如果设置了lines 大于1，此时inputType如果设置为text
-                那么，editText会无法换行，而且显示的高度也是1，并不是设置的lines。
+                android:orientation="horizontal">
 
-                正确写法是。lines 设置为大于1，并且inputType 设置为textMultiLine
-            -->
+                <EditText
+                    android:id="@+id/etWatermarkText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="start|top"
+                    android:hint="输入水印文字"
+                    android:inputType="textMultiLine"
+                    android:lines="3"
+                    android:maxLines="3"
+                    android:padding="16dp"
+                    android:textColor="#000000"
+                    android:textSize="18sp" />
+                <!-- 注意事项 -->
+                <!-- EditText如果设置了lines 大于1，此时inputType如果设置为text
+                    那么，editText会无法换行，而且显示的高度也是1，并不是设置的lines。
 
-            <Button
-                android:id="@+id/btnApplyText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Button" />
+                    正确写法是。lines 设置为大于1，并且inputType 设置为textMultiLine
+                -->
+
+                <Button
+                    android:id="@+id/btnApplyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="设置\n文字" />
+            </LinearLayout>
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -320,6 +328,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:checked="true"
                 android:text="背景色"
                 app:layout_constraintStart_toStartOf="@+id/guideline3"
                 app:layout_constraintTop_toBottomOf="@+id/tvColorSample" />
