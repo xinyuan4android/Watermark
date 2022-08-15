@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         seekBarDegrees.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                float degrees = -90 + progress / 100.0F * 180;
+                float degrees = progress / 100.0F * 360;
                 waterMarkDrawable.setDegrees(degrees);
             }
 

@@ -140,7 +140,7 @@ public class WaterMarkDrawable extends Drawable {
     /**
      * 默认旋转角度
      */
-    private static final float DEFAULT_DEGREES = -50.0F;
+    private static final float DEFAULT_DEGREES = 0.0F;
 
     public void setDegrees(float degrees) {
 //        if (degrees == 0.0F) {
