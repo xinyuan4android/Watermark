@@ -2,6 +2,8 @@
 * * *
 方便为android开发者提供给view添加背景或者前景水印的库。
 通过自定义`Drawable`的方式实现自定义水印，在不入侵代码的情况下，最大限度方便大家设置。
+![image](https://raw.githubusercontent.com/xinyuan4android/Watermark/master/screenshot/add2Activity.gif)
+![image](https://raw.githubusercontent.com/xinyuan4android/Watermark/master/screenshot/add2View.gif)
 ### how to add
 * * *
 #### Gradle Groovy DSL gradle.org
