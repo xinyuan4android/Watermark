@@ -3,6 +3,8 @@ package com.pcitc.watermark;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -19,7 +21,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * 1.为什么选择自定义drawable而不是自定义view（分析drawable，view，bitmap区别）
@@ -81,10 +85,41 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String s = etWatermarkText.getText().toString();
-                waterMarkDrawable.setWaterMarkText(s);
             }
         });
+        etWatermarkText.addTextChangedListener(new TextWatcher() {
+            //This method is called to notify you that, within s,
+            // the count characters beginning at start are about to be replaced by new text with length after.
 
+            //s，是改变之前的字符。
+            //从start位置开始，将会有count个字符【被】之后的after个字符替换（将会有after个字符替换之前的count个字符）
+            // 不推荐在这个回调方法中修改EditText的内容
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                Log.i("MainActivity", "beforeTextChanged: charSequence=" + s + ", start=" + start + ", count=" + count + ", after=" + after);
+            }
+
+            //This method is called to notify you that, within s,
+            // the count characters beginning at start have just replaced old text that had length before.
+
+            //s，是改变后的字符
+            // 从start位置开始，将会有count个字符替换之前的before个字符
+            // 不推荐在这个回调方法中修改EditText的内容
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.i("MainActivity", "onTextChanged: charSequence=" + s + ", start=" + start + ", before=" + before + ", count=" + count);
+            }
+
+            //This method is called to notify you that, somewhere within s, the text has been changed.
+            //每当editText输入框里的字符变化的时候，都会回调该方法。在方法里如果要修改EditText的内容时，
+            //小心不要陷入死循环。
+            @Override
+            public void afterTextChanged(Editable s) {
+                Log.i("MainActivity", "afterTextChanged: charSequence=" + s);
+                waterMarkDrawable.setWaterMarkText(s.toString());
+
+            }
+        });
         waterMarkDrawable = WaterMarkHelper.addWaterMark(llBg);
         spinnerType.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, Arrays.asList("给指定view添加", "给activity添加")));
@@ -147,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         spinnerMode.setAdapter(new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_dropdown_item, Arrays.asList("single", "repeat")));
+                android.R.layout.simple_spinner_dropdown_item, Arrays.asList("repeat", "single")));
         spinnerMode.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -276,6 +311,17 @@ public class MainActivity extends AppCompatActivity {
         seekBarColorR.setOnSeekBarChangeListener(listener);
         seekBarColorG.setOnSeekBarChangeListener(listener);
         seekBarColorB.setOnSeekBarChangeListener(listener);
+        List<TextView> textViewList = new ArrayList<>();
+        TextView textView = new TextView(this);
+        TextView textView2 = new Button(this);
+        textViewList.add(textView);
+        textViewList.add(textView2);
+        textView = null;
+        Log.e("view", "textView" + textView);
+        Log.e("view", "textView2" + textView2);
+        for (TextView view : textViewList) {
+            Log.e("View", view.toString());
+        }
     }
 
     @SuppressLint("WrongConstant")

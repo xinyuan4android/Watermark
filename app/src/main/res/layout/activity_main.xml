@@ -65,6 +65,7 @@
                     android:id="@+id/btnApplyText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:text="设置\n文字" />
             </LinearLayout>
 
